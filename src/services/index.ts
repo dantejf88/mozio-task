@@ -1,24 +1,11 @@
-import { distanceMaker, citiesNames, arrayFiltered, itemsComparition} from '../utils'
-import { City } from '../types'
+import { distanceMaker, citiesNames, arrayFiltered, itemsComparition, } from '../utils'
+import { City, CityName } from '../types'
 
-// export const getCities = function (value: string) {
-//     return new Promise(function (resolve, reject) {
-//         setTimeout(() => {
-//             if(value.toLowerCase() !== 'fail'){
-//                 if (value) resolve(citiesNames.filter((x) => x.name.toLowerCase().includes(value.toLowerCase())));
-//                 return resolve(citiesNames)
-//             } else {
-//                 return reject(Error("Fail"));
-//             } 
-//         }, 1000)
-//     });
-// };
-
-export const getCities = function (value: string, paramsList: {key: string, name: string}[] | []): Promise<any>  {
+export const getCities = function (value: string, citiesList: CityName[] | []): Promise<any>  {
     return new Promise(function (resolve, reject) {
         setTimeout(() => {
-            if(value.toLowerCase() !== 'fail'){
-                const cityNameFiltered = arrayFiltered(citiesNames, paramsList, itemsComparition)
+            if(!value.toLowerCase().includes('fail')){
+                const cityNameFiltered = arrayFiltered(citiesNames, citiesList, itemsComparition)
                 if (value) resolve(cityNameFiltered.filter((x) => x.name.toLowerCase().includes(value.toLowerCase())));
                 return resolve(cityNameFiltered)
             } 

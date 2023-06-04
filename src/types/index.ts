@@ -30,12 +30,4 @@ export type CityWithDistance = {
 
 export type CollectionCitiesWithDistance = Array<CityWithDistance>
 
-export type ItemsComparitionType = (a: CityName, b: {key: string, name: string}) => boolean
-
-// export interface FormInput {
-//     name: string
-// }
-
-
-
-
+export type ItemsComparitionType = (a: CityName, b: CityName) => boolean

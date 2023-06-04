@@ -13,13 +13,13 @@ import { colors } from '../theme'
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [params, setParams] = useState<{key: string, name: string, errorMsg: string, error: boolean}[] | []>([])
-  const [paramsState, setParamsState] = useState<{origin: CityParamState, intermediate: CityParamState[], destination: CityParamState}>({
+  const [paramsState, setParamsState] = useState<{origin: CityParamState, intermediate: CityParamState[], destination: CityParamState, totalParams: number, totalCities: CityName[]}>({
     origin: {name: '', errorMsg: '', error: false},
     intermediate: [],
+    totalParams: 0,
+    totalCities: [],
     destination: {name: '', errorMsg: '', error: false}
   })
-  const [citiesState, setCityState] = useState<{origin: boolean, destination: boolean}>({origin: false, destination: false})
   const [showNewInput, setShowNewInput] = useState<boolean>(false)
 
   useEffect(() => {
@@ -27,10 +27,10 @@ function App() {
   }, [paramsState])
 
   useEffect(() => {
-    const listParams = []
+    const listCities: CityName[] = []
     const intermediateList: CityParamState[] = []
     for (const entry of searchParams.entries()) {
-      console.log(entry)
+      if(entry[1] !== '') listCities.push({ name: entry[1] })
       if(entry[0] === 'origin') {
         setParamsState(prevState => ({
           ...prevState,
@@ -58,51 +58,61 @@ function App() {
           error: false
         })
       }
-        listParams.push({ 
-          key: entry[0], 
-          name: entry[1],
-          errorMsg: entry[0] === 'origin' && entry[1] === '' ? 'You must choose the city of origin' : '',
-          error: entry[0] === 'origin' && entry[1] === '' 
-        })
     }
     setParamsState(prevState => ({
       ...prevState,
+      totalParams: intermediateList.length,
+      totalCities: listCities,
       intermediate: intermediateList.filter((x) => x.name !== '')
     }))
-    setParams(listParams.filter((x) => x.name !== ''))
+    setShowNewInput(false)
   }, [searchParams])
-
-  // useEffect(() => {
-  //   const listParams = []
-  //   for (const entry of searchParams.entries()) {
-  //     console.log(entry)
-  //       listParams.push({ 
-  //         key: entry[0], 
-  //         name: entry[1],
-  //         errorMsg: entry[0] === 'origin' && entry[1] === '' ? 'You must choose the city of origin' : '',
-  //         error: entry[0] === 'origin' && entry[1] === '' 
-  //       })
-  //   }
-  //   setParams(listParams.filter((x) => x.name !== ''))
-  // }, [searchParams])
-
-  useEffect(() => {
-    setCityState({
-      origin: params.filter((x) => x.key === 'origin').length > 0,
-      destination: params.filter((x) => x.key === 'destination').length > 0
-    })
-  }, [params])
 
   const handleChange = (e: CityName, name: string) => {
     const paramValue = !e ? '' : e.name
     searchParams.set(name, paramValue);
     setSearchParams(searchParams)
-    setShowNewInput(false)
+  }
+
+  const setError = (element: any, index: number | undefined, err: any) => {
+    if(index !== undefined) {
+      const helper = paramsState.intermediate
+      helper[index] = {
+        key: element.key,
+        name: element.name,
+        errorMsg: err.errorMsg,
+        error: err.status === 500
+      }  
+      setParamsState(prevState => ({
+        ...prevState,
+        intermediate: helper
+      }))
+    } else {
+      setParamsState(prevState => ({
+        ...prevState,
+        [element.key]: {
+          name: element.name,
+          errorMsg: err.errorMsg,
+          error: err.status === 500
+        },
+      }))
+    }
   }
 
   const onSubmit = () => {
-    console.log(params)
+    console.log(paramsState)
   }
+
+  // const clearForm = () => {
+  //   setSearchParams('')
+  //   setParamsState({
+  //     origin: {name: '', errorMsg: '', error: false},
+  //     intermediate: [],
+  //     totalParams: 0,
+  //     totalCities: [],
+  //     destination: {name: '', errorMsg: '', error: false}
+  //   })
+  // }
 
   return (
     <Container>
@@ -120,28 +130,22 @@ function App() {
           <AsyncSelect
             id='origin'
             value={paramsState.origin.name ? setValue(paramsState.origin) : undefined}
-            // value={params.filter((x) => x.key === 'origin')[0]?.key ? setValue(params.filter((x) => x.key === 'origin')[0]) : undefined}
             backspaceRemovesValue={false}
             loadOptions={(e) => 
-              getCities(e, params)
+              getCities(e, paramsState.totalCities)
               .then((res) => res)
               .catch((err) => 
-                setParamsState(prevState => ({
-                  ...prevState,
-                  origin: {
-                    ...prevState.origin,
-                    errorMsg: err.errorMsg,
-                    error: err.status === 500
-                  },
-                }))
-              )
+                setError({key: 'origin', name: paramsState.origin.name}, undefined, err))
             }
+            onInputChange={() => (
+              paramsState.origin.error && 
+                setError({key: 'origin', name: paramsState.origin.name}, undefined, {errorMsg: '', error: false}))}
             getOptionLabel={(x: CityName) => x.name}
             getOptionValue={(x: CityName) => x.name}
             onChange={(x) => {handleChange(x, 'origin')}}
             noOptionsMessage={(e) => 
-                                e.inputValue.toLowerCase() === 'fail' ? null 
-                                : e.inputValue.length > 0 ? 'No match found (cannot repeat city)' 
+                                e.inputValue.toLowerCase().includes('fail') ? null
+                                : e.inputValue.length > 0 ? 'No match found (cannot repeat cities)' 
                                 : 'Start typing to search available cities'
                               }
             placeholder='City name'
@@ -168,8 +172,6 @@ function App() {
       </DestinationInputContaier>
           {
             paramsState.intermediate.map((x, i) => {
-              console.log(x)
-              // if(x.key !== 'origin' && x.name !== '' && x.key !== 'destination') {
                 return (
                 <DestinationInputContaier key={i}>
                   <Text
@@ -186,20 +188,45 @@ function App() {
                     id={`${x.name}`} 
                     value={paramsState.intermediate[i]?.name ? setValue(paramsState.intermediate[i]) : undefined}
                     backspaceRemovesValue={false}
-                    loadOptions={(e) => getCities(e, paramsState.intermediate)}
+                    loadOptions={(e) => 
+                      getCities(e, paramsState.totalCities)
+                      .then((res) => res)
+                      .catch((err) => 
+                        setError(x, i, err)
+                      )
+                    }
                     getOptionLabel={(xs: CityName) => xs.name}
                     getOptionValue={(xs: CityName) => xs.name}
                     onChange={(xs) => handleChange(xs, `${x.key}`)}
-                    noOptionsMessage={(e) => e.inputValue.length > 0 ?  'No match found (cannot repeat city)' : 'Start typing to search available cities'}
+                    noOptionsMessage={(e) => 
+                      e.inputValue.toLowerCase().includes('fail') ? null 
+                      : e.inputValue.length > 0 ? 'No match found (cannot repeat cities)' 
+                      : 'Start typing to search available cities'
+                    }
+                    onInputChange={() => (x.error && setError(x, i, {errorMsg: '', error: false}))}
                     loadingMessage={() => null}
                     placeholder='City name'
                     isClearable
-                    isDisabled={!(citiesState.origin)}
+                    isDisabled={paramsState.origin.name === ''}
                     styles={createRecordsStyles}
                   />
+                  {
+                    x.error &&
+                      <Text
+                        fontSize="12px"
+                        lineHeight="16px"
+                        letterSpacing="0px"
+                        padding="10px 0 5px 0"
+                        fontWeight="500"
+                        color={colors.red}
+                        textAlign='left'
+                        width='100%'
+                      >
+                        {x.errorMsg}
+                      </Text>
+                  }
                 </DestinationInputContaier>
                 )
-              // }
             })
           }
           {
@@ -218,22 +245,22 @@ function App() {
                   <AsyncSelect
                     id={'intermediate'} 
                     backspaceRemovesValue={false}
-                    loadOptions={(e) => getCities(e, paramsState.intermediate)}
+                    loadOptions={(e) => getCities(e, paramsState.totalCities)}
                     getOptionLabel={(xs: CityName) => xs.name}
                     getOptionValue={(xs: CityName) => xs.name}
-                    onChange={(xs) => handleChange(xs, `intermediate${paramsState.intermediate.length + 1}`)}
-                    noOptionsMessage={(e) => e.inputValue.length > 0 ?  'No match found (cannot repeat city)' : 'Start typing to search available cities'}
+                    onChange={(xs) => handleChange(xs, `intermediate${paramsState.totalParams + 1}`)}
+                    noOptionsMessage={(e) => e.inputValue.length > 0 ?  'No match found (cannot repeat cities)' : 'Start typing to search available cities'}
                     loadingMessage={() => null}
                     placeholder='City name'
                     isClearable
-                    isDisabled={!(citiesState.origin)}
+                    isDisabled={paramsState.origin.name === ''}
                     styles={createRecordsStyles}
                   />
                 </DestinationInputContaier>
             ) : 
               <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '20px' }}>
                 {
-                  citiesState.origin && 
+                  paramsState.origin.name !== '' && 
                     <button onClick={() => setShowNewInput(true)}>Add intermediate</button>
                 }
               </div>
@@ -255,32 +282,24 @@ function App() {
                   // value={params.filter((x) => x.key === 'destination')[0]?.key ? setValue(params.filter((x) => x.key === 'destination')[0]) : undefined}
                   backspaceRemovesValue={false}
                   loadOptions={(e) => 
-                    getCities(e, params)
+                    getCities(e, paramsState.totalCities)
                     .then((res) => res)
-                    .catch((err) => 
-                      setParamsState(prevState => ({
-                        ...prevState,
-                        destination: {
-                          ...prevState.destination,
-                          errorMsg: err.errorMsg,
-                          error: err.status === 500
-                        },
-                      }))
-                    )
+                    .catch((err) => setError({key: 'destination', name: paramsState.origin.name}, undefined, err))
                   }
+                  onInputChange={() => (paramsState.destination.error && setError({key: 'destination', name: paramsState.destination.name}, undefined, {errorMsg: '', error: false}))}
                   getOptionLabel={(x: CityName) => x.name}
                   getOptionValue={(x: CityName) => x.name}
                   onChange={(x) => handleChange(x, 'destination')}
                   noOptionsMessage={(e) => 
-                    e.inputValue.toLowerCase() === 'fail' ? null 
-                    : e.inputValue.length > 0 ? 'No match found (cannot repeat city)' 
+                    e.inputValue.toLowerCase().includes('fail') ? null 
+                    : e.inputValue.length > 0 ? 'No match found (cannot repeat cities)' 
                     : 'Start typing to search available cities'
                   }
                   loadingMessage={() => null}
                   placeholder='City name'
                   isClearable
                   onError={(e) => console.log(e)}
-                  isDisabled={!(citiesState.origin)}
+                  isDisabled={paramsState.origin.name === ''}
                   required
                   styles={createRecordsStyles}
                 />
@@ -301,8 +320,11 @@ function App() {
                 }
             </DestinationInputContaier>
                 <div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '20px 0' }}>
-                  <button onClick={onSubmit} disabled={!citiesState.origin || !citiesState.destination} >Submit</button>     
+                  <button onClick={onSubmit} disabled={paramsState.origin.name === '' || paramsState.destination.name === ''} >Submit</button>     
                 </div>
+                {/* <div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '20px 0' }}>
+                  <button onClick={clearForm} disabled={!paramsState.totalCities.length} >Clear form</button>     
+                </div> */}
       <a href={`/result`}>Result</a>
     </Container>
   )

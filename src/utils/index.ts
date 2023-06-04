@@ -1,4 +1,4 @@
-import { CollectionCities, City, CollectionCitiesWithDistance, CollectionCitiesName, CityName, ItemsComparitionType } from '../types'
+import { CollectionCities, City, CollectionCitiesWithDistance, CollectionCitiesName, CityName, ItemsComparitionType, CityParamState } from '../types'
 
 export const setValue = (query: CityName) => {
     if (!query) {
@@ -38,9 +38,9 @@ export const distanceMaker = (list: City[]) => {
     return { cityList, completeDistance: cityList.reduce((acc, x) => acc + x.distance, 0) }
 }
 
-export const itemsComparition = (a: CityName, b: {key: string, name: string}) => a.name === b.name;
+export const itemsComparition = (a: CityName, b: CityName) => a.name === b.name;
 
-export const arrayFiltered = (a: CityName[], b: {key: string, name: string}[], compareFunction: ItemsComparitionType) => 
+export const arrayFiltered = (a: CityName[], b: CityName[], compareFunction: ItemsComparitionType) => 
   a.filter(aValue =>
     !b.some(bValue => 
       compareFunction(aValue, bValue)));
