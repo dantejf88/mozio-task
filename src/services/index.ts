@@ -14,15 +14,15 @@ import { City } from '../types'
 //     });
 // };
 
-export const getCities = function (value: string, params: {key: string, name: string}[] | []): Promise<any>  {
+export const getCities = function (value: string, paramsList: {key: string, name: string}[] | []): Promise<any>  {
     return new Promise(function (resolve, reject) {
         setTimeout(() => {
             if(value.toLowerCase() !== 'fail'){
-                const cityNameFiltered = arrayFiltered(citiesNames, params, itemsComparition)
+                const cityNameFiltered = arrayFiltered(citiesNames, paramsList, itemsComparition)
                 if (value) resolve(cityNameFiltered.filter((x) => x.name.toLowerCase().includes(value.toLowerCase())));
                 return resolve(cityNameFiltered)
             } 
-            return reject(new Error('SERVER_ERROR'));
+            return reject({ status: 500, errorMsg: 'Oops! Failed to search with this keyword.' });
         }, 1000)
     });
 };

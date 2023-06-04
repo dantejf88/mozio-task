@@ -9,6 +9,7 @@ export interface CityName {
 }
 
 export interface CityParamState {
+    key?: string
     name: string
     error: boolean
     errorMsg: string
