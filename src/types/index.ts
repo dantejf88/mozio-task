@@ -1,3 +1,4 @@
+
 export interface OptionRecords {
     value: string
     label: string
@@ -9,6 +10,7 @@ export interface CityName {
 }
 
 export interface CityParamState {
+    key?: string
     name: string
     error: boolean
     errorMsg: string
@@ -29,12 +31,8 @@ export type CityWithDistance = {
 
 export type CollectionCitiesWithDistance = Array<CityWithDistance>
 
-export type ItemsComparitionType = (a: CityName, b: {key: string, name: string}) => boolean
+export type ItemsComparitionType = (a: CityName, b: CityName) => boolean
 
-// export interface FormInput {
-//     name: string
-// }
+export type DateHandlerType = (date: Date | undefined) => string
 
-
-
-
+export type TravelDataType = { completeDistance: number, passengers: number | string, date: string }

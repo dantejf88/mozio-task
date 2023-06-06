@@ -2,12 +2,15 @@ import { DefaultTheme } from "styled-components";
 
 declare module "styled-components" {
   export interface DefaultTheme {
-    white: string;
-    red: string;
-    purpleLight: string;
-    purpleDark: string;
-    black: string;
-    grey: string;
+    colors: {        
+        white: string;
+        red: string;
+        purpleLight: string;
+        purpleDark: string;
+        black: string;
+        grey: string;
+        }
+    mediaQueryMobile: string    
   }
 }
 
@@ -22,5 +25,6 @@ export const colors = {
 }
 
 export const theme: DefaultTheme = {
-    ...colors
+    colors: colors,
+    mediaQueryMobile: '600px',
 };

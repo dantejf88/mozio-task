@@ -1,164 +1,250 @@
 'use strict'
 import { useState, useEffect, Fragment } from 'react'
-import { Container, DestinationInputContaier } from './homeStyles'
-import debounce from 'debounce-promise'
-import { getDistances, getCities } from '../services'
-import { distanceCalculator, distanceMaker, citiesList, setValue } from '../utils'
+import { Container, InputsContaier, DataContaier, DynamicContainer } from './homeStyles'
+import { dateHandler } from '../utils'
+import { Button } from '../stylesComponents'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { City, CityName } from '../types'
-import AsyncSelect from 'react-select/async'
-import { createRecordsStyles } from '../react-select-styles'
+import { CityName, CityParamState } from '../types'
+import RoadIcons from '../components/RoadIcons'
+import TravelData from '../components/TravelData'
+import DestinationInput from '../components/InputCities/destinationInput'
+import NewInput from '../components/InputCities/newInput'
+import IntermediateInput from '../components/InputCities/intermediateInput'
+import OriginInput from '../components/InputCities/originInput'
+import "react-datepicker/dist/react-datepicker.css";
+import { colors } from '../theme'
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [params, setParams] = useState<{key: string, name: string, errorMsg: string, error: boolean}[] | []>([])
-  const [citiesState, setCityState] = useState<{origin: boolean, destination: boolean}>({origin: false, destination: false})
-  const [showNewInput, setShowNewInput] = useState<boolean>(false)
+  const [dateState, setDateState] = useState<{value: Date | undefined, error: boolean}>({value: undefined, error: false});
+  const [passengersState, setPassengersState] = useState({value: 0, error: false});
+  const [paramsState, setParamsState] = useState<{origin: CityParamState, intermediate: CityParamState[], destination: CityParamState, totalParams: number, totalCities: CityName[]}>({
+    origin: {name: '', errorMsg: '', error: false},
+    intermediate: [],
+    totalParams: 0,
+    totalCities: [],
+    destination: {name: '', errorMsg: '', error: false}
+  })
+  const [newInput, setNewInput] = useState<{show: boolean, error: boolean, errorMsg: string}>({show: false, error: false, errorMsg: ''})
+  const [disabledSubmit, setDisabledSubmit] = useState(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
-    const listParams = []
+    setDisabledSubmit(
+      paramsState.origin.name === '' ||
+      paramsState.destination.name === '' ||
+      dateState.value === undefined ||
+      passengersState.value === 0
+    )
+  }, [paramsState, dateState, passengersState])
+
+  useEffect(() => {
+    const listCities: CityName[] = []
+    const intermediateList: CityParamState[] = []
     for (const entry of searchParams.entries()) {
-      console.log(entry)
-        listParams.push({ 
+      if(entry[1] !== '') listCities.push({ name: entry[1] })
+      if(entry[0] === 'origin') {
+        setParamsState(prevState => ({
+          ...prevState,
+          origin: {
+            name: entry[1],
+            errorMsg: entry[1] === '' ? 'You must choose the city of origin' : '',
+            error: entry[1] === ''
+          },
+        }))
+      }
+      if(entry[0] === 'destination') {
+        setParamsState(prevState => ({
+          ...prevState,
+          destination: {
+            name: entry[1],
+            errorMsg: entry[1] === '' ? 'You must choose the final city destination' : '',
+            error: entry[1] === ''
+          },
+        }))
+      } if(entry[0] === 'passengers') {
+          if(entry[1] === '0') {
+            setPassengersState({ value: 0, error: true })
+          } else {
+            setPassengersState({ value: parseInt(entry[1]), error: false })
+          }
+      }  if(entry[0] === 'date') {
+            if(entry[1] === '') {
+              setDateState({ value: undefined, error: true })
+            } else {
+              setDateState({ value: new Date(entry[1]), error: false })
+            }
+        } else if(
+            entry[0].includes('intermediate')     
+          ) {
+        intermediateList.push({ 
           key: entry[0], 
           name: entry[1],
-          errorMsg: entry[0] === 'origin' && entry[1] === '' ? 'You must choose the city of origin' : '',
-          error: entry[0] === 'origin' && entry[1] === '' 
+          errorMsg: '',
+          error: false
         })
+      }
     }
-    setParams(listParams.filter((x) => x.name !== ''))
+    setParamsState(prevState => ({
+      ...prevState,
+      totalParams: intermediateList.length,
+      totalCities: listCities,
+      intermediate: intermediateList.filter((x) => x.name !== '')
+    }))
+    setNewInput(prevState => ({ ...prevState, show: false }))
   }, [searchParams])
 
-  useEffect(() => {
-    setCityState({
-      origin: params.filter((x) => x.key === 'origin').length > 0,
-      destination: params.filter((x) => x.key === 'destination').length > 0
-    })
-  }, [params])
+  const handleChange = (e: CityName, name: string): void => {
+    if(e===null && name !== 'origin' && name !== 'destination') {
+      searchParams.delete(name)
+    } else {
+      const paramValue = !e ? '' : e.name
+      searchParams.set(name, paramValue)
+    }
+    return setSearchParams(searchParams)
+  }
 
-  const handleChange = (e: CityName, name: string) => {
-    console.log(e, name)
-    const paramValue = !e ? '' : e.name
-    searchParams.set(name, paramValue);
-    setSearchParams(searchParams)
-    setShowNewInput(false)
+  const setError = (element: any, index: number | undefined, err: any) => {
+    if(index !== undefined) {
+      const helper = paramsState.intermediate
+      helper[index] = {
+        key: element.key,
+        name: element.name,
+        errorMsg: err.errorMsg,
+        error: err.status === 500
+      }  
+      setParamsState(prevState => ({
+        ...prevState,
+        intermediate: helper
+      }))
+    } else {
+      setParamsState(prevState => ({
+        ...prevState,
+        [element.key]: {
+          name: element.name,
+          errorMsg: err.errorMsg,
+          error: err.status === 500
+        },
+      }))
+    }
   }
 
   const onSubmit = () => {
-    console.log(params)
+    let query = ''
+    query = query.concat(`origin=${paramsState.origin.name}&destination=${paramsState.destination.name}&date=${encodeURIComponent(dateHandler(dateState.value))}&passengers=${passengersState.value}`)
+    if(paramsState.intermediate.length > 0) {
+      paramsState.intermediate.forEach(element => {
+        return query += `&${element.key}=${element.name}`
+      })
+    }
+    return navigate(`/result?${query}`)
+  }
+
+  const onClear = () => {
+    setSearchParams('?origin=&destination=')
+    setDateState({ value: undefined, error: true })
+    setPassengersState({ value: 0, error: true })
+    setParamsState({
+      origin: {name: '', errorMsg: '', error: false},
+      intermediate: [],
+      totalParams: 0,
+      totalCities: [],
+      destination: {name: '', errorMsg: '', error: false}
+    })
   }
 
   return (
-    <Container>
-        <p style={{ margin: '20px 0 5px 0', width: '100%', textAlign: 'left' }}>City of origin</p>
-          <AsyncSelect
-            id='origin'
-            value={params.filter((x) => x.key === 'origin')[0]?.key ? setValue(params.filter((x) => x.key === 'origin')[0]) : undefined}
-            backspaceRemovesValue={false}
-            loadOptions={(e) => 
-              getCities(e, params)
-              .then((res) => res)
-              .catch((err) => console.log(err))
-            }
-            getOptionLabel={(x: CityName) => x.name}
-            getOptionValue={(x: CityName) => x.name}
-            onChange={(x) => {handleChange(x, 'origin')}}
-            noOptionsMessage={(e) => 
-                                e.inputValue.toLowerCase() === 'fail' ? null 
-                                : e.inputValue.length > 0 ? 'No match found (cannot repeat city)' 
-                                : 'Start typing to search available cities'
-                              }
-            placeholder='City name'
-            isClearable
-            onError={(e) => console.log(e)}
-            onErrorCapture={(e) => console.log(e)}
-            required
-            aria-invalid={(e) => setTimeout(() => console.log(e), 1000)}
-            label='City of origin'
-            // isOptionDisabled={() =>
-            //     author_name ? author_name instanceof Array && author_name.length >= 5 : false
-            // }
-            styles={createRecordsStyles}
+    <section style={{ width: '100%', padding: '0 20px' }}>
+      <Container>
+        <InputsContaier>
+          <DynamicContainer widthDesktop='20%' widthMobile='10%'>
+            <RoadIcons intermediateCities={paramsState.intermediate} newInput={newInput.show}/>
+          </DynamicContainer>
+          <DynamicContainer widthDesktop='80%' widthMobile='90%'>
+              <OriginInput
+                paramsState={paramsState} 
+                handleChange={handleChange}
+                setError={setError}
+              />
+              {
+                paramsState.intermediate.map((x, i) => {
+                    return (
+                      <Fragment key={i}>
+                        <IntermediateInput
+                          paramsState={paramsState} 
+                          handleChange={handleChange}
+                          setError={setError}
+                          element={x}
+                          index={i}
+                        />
+                      </Fragment>
+                    )
+                })
+              }
+              {
+                newInput.show ? (
+                  <NewInput
+                    paramsState={paramsState} 
+                    handleChange={handleChange}
+                    setNewInput={setNewInput}
+                    newInput={newInput}
+                  />
+                ) : 
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%', margin: '0 0 20px 0' }}>
+                        <button 
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            outline: 'none',
+                            color: `${paramsState.origin.name === '' ? colors.purpleLight : colors.purpleDark}`,
+                            cursor: 'pointer',
+                            padding: '0',
+                          }}
+                          disabled={paramsState.origin.name === ''}
+                          onClick={() => setNewInput(prevState => ({ ...prevState, show: true }))}
+                        >
+                        +  Add intermediate
+                        </button>
+                  </div>
+              }
+              <DestinationInput
+                paramsState={paramsState} 
+                handleChange={handleChange}
+                setError={setError}
+              />
+          </DynamicContainer>
+        </InputsContaier>
+        <DataContaier>
+          <TravelData
+            date={dateState}
+            passengers={passengersState}
+            handleChange={handleChange}
           />
-          {
-            params.filter((x) => x.key === 'origin')[0]?.error &&
-              <p style={{ margin: '20px 0 5px 0', width: '100%', textAlign: 'left' }}>{params.filter((x) => x.key === 'origin')[0]?.errorMsg}</p>
-          }
-          {
-            params.map((x, i) => {
-              if(x.key !== 'origin' && x.name !== '' && x.key !== 'destination') {
-                return (
-                <DestinationInputContaier key={i}>
-                  <p style={{ margin: '20px 0 5px 0', width: '100%', textAlign: 'left' }}>City of destination</p>
-                  <AsyncSelect
-                    id={`${x.name}`} 
-                    value={params[i]?.name ? setValue(params[i]) : undefined}
-                    backspaceRemovesValue={false}
-                    loadOptions={(e) => getCities(e, params)}
-                    getOptionLabel={(xs: CityName) => xs.name}
-                    getOptionValue={(xs: CityName) => xs.name}
-                    onChange={(xs) => handleChange(xs, `${x.key}`)}
-                    noOptionsMessage={(e) => e.inputValue.length > 0 ?  'No match found (cannot repeat city)' : 'Start typing to search available cities'}
-                    loadingMessage={() => null}
-                    placeholder='City name'
-                    isClearable
-                    isDisabled={!(citiesState.origin)}
-                    styles={createRecordsStyles}
-                  />
-                </DestinationInputContaier>
-                )}}
-            )
-          }
-          {
-            showNewInput ? (
-              <DestinationInputContaier>
-                  <p style={{ margin: '20px 0 5px 0', width: '100%', textAlign: 'left' }}>Intermediate city</p>
-                  <AsyncSelect
-                    id={'intermediate'} 
-                    backspaceRemovesValue={false}
-                    loadOptions={(e) => getCities(e, params)}
-                    getOptionLabel={(xs: CityName) => xs.name}
-                    getOptionValue={(xs: CityName) => xs.name}
-                    onChange={(xs) => handleChange(xs, `intermediate${params.length}`)}
-                    noOptionsMessage={(e) => e.inputValue.length > 0 ?  'No match found (cannot repeat city)' : 'Start typing to search available cities'}
-                    loadingMessage={() => null}
-                    placeholder='City name'
-                    isClearable
-                    isDisabled={!(citiesState.origin)}
-                    styles={createRecordsStyles}
-                  />
-                </DestinationInputContaier>
-            ) : 
-              <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '20px' }}>
-                {
-                  citiesState.origin && 
-                    <button onClick={() => setShowNewInput(true)}>Add intermediate</button>
-                }
-              </div>
-          }
-                <p style={{ margin: '20px 0 5px 0', width: '100%', textAlign: 'left' }}>City of destination</p>
-                <AsyncSelect
-                  id='destination'
-                  value={params.filter((x) => x.key === 'destination')[0]?.key ? setValue(params.filter((x) => x.key === 'destination')[0]) : undefined}
-                  backspaceRemovesValue={false}
-                  loadOptions={(e) => getCities(e, params)}
-                  getOptionLabel={(x: CityName) => x.name}
-                  getOptionValue={(x: CityName) => x.name}
-                  onChange={(x) => handleChange(x, 'destination')}
-                  noOptionsMessage={(e) => e.inputValue.length > 0 ? 'No match found (cannot repeat city)' : 'Start typing to search available cities'}
-                  loadingMessage={() => null}
-                  placeholder='City name'
-                  isClearable
-                  onError={(e) => console.log(e)}
-                  isDisabled={!(citiesState.origin)}
-                  required
-                  styles={createRecordsStyles}
-                />
-                <div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '20px 0' }}>
-                  <button onClick={onSubmit} disabled={!citiesState.origin || !citiesState.destination} >Submit</button>     
-                </div>
-      <a href={`/result`}>Result</a>
-    </Container>
+        </DataContaier>
+      </Container>
+      <div style={{ 
+        display: 'flex',
+        justifyContent: 'space-between',
+        height: '120px',
+        width: '100%',
+        margin: '0 0 20px 0',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}>
+        <Button
+          onClick={onSubmit} 
+          disabled={disabledSubmit} 
+        >
+          Submit
+        </Button>     
+        <Button
+          onClick={onClear} 
+        >
+          Clear form
+        </Button>     
+      </div>
+    </section>
   )
 }
 
