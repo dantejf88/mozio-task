@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Text, Button } from '../../stylesComponents'
-import { Ul, Li, Container } from './travelResultStyle'
+import { Ul, Li, Container } from './TravelResultStyle'
 import { TravelDataType } from '../../types'
 import { colors } from '../../theme'
 

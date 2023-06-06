@@ -7,7 +7,6 @@ export const Container = styled.section`
     justify-content: center;
     align-items: center;
     width: 100%;
-    /* height: 100%; */
     overflow-y: scroll;
     @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
       padding: 80px 20px 20px 20px;
@@ -18,8 +17,6 @@ export const Container = styled.section`
 export const Ul = styled.ul`
     display: flex;
     flex-direction: column;
-    @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
-    }
 `
 
 interface LiProp {
@@ -27,7 +24,6 @@ interface LiProp {
 }
 
 export const Li = styled.li<LiProp>`
-    /* display: flex; */
     height: 44px;
     list-style-image: ${props => `url(${props.urlImg})`};
     &::marker {

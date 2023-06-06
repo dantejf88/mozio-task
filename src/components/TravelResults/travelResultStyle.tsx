@@ -11,9 +11,6 @@ export const Container = styled.section`
 export const Ul = styled.ul`
     display: flex;
     flex-direction: column;
-
-    @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
-    }
 `
 
 interface LiProp {
@@ -21,7 +18,6 @@ interface LiProp {
 }
 
 export const Li = styled.li<LiProp>`
-    /* display: flex; */
     position: relative;
     height: 70px;
     width: 140px;

@@ -3,8 +3,6 @@ import styled from 'styled-components';
 export const Ul = styled.ul`
     flex-direction: column;
     margin: 0;
-    @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
-    }
 `
 
 interface LiProp {
