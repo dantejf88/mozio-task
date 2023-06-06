@@ -5,7 +5,7 @@ import { Container } from './resultStyle'
 import TravelResult from '../components/TravelResults'
 import { colors } from '../theme'
 import { citiesListComplete, months } from '../utils'
-import { TravelDataType } from '../types'
+import { TravelDataType, CollectionCities } from '../types'
 import { getDistances } from '../services'
 
 function SearchResult() {
@@ -16,17 +16,24 @@ function SearchResult() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const list = []
+    const list: any = []
+    let originItem: CollectionCities = []
+    let destinationItem: CollectionCities = []
     for (const entry of searchParams.entries()) {
       if(entry[0] === 'passengers') {
         setTravelData((prevState: TravelDataType) => ({...prevState, passengers: entry[1]}))
       } else if(entry[0] === 'date' && entry[1] !== '') {
         const date = new Date(entry[1])
         setTravelData(prevState => ({...prevState, date: `${months[date.getMonth()]} ${String(date.getDate())}, ${date.getFullYear()}`}))
-      } 
-      list.push(...citiesListComplete.filter((x) => x[0].toLowerCase().includes(entry[1].toLowerCase())))
+      }  else if (entry[0] === 'origin') {
+        originItem = [...citiesListComplete.filter((x) => x[0].toLowerCase().includes(entry[1].toLowerCase()))]
+      } else if (entry[0] === 'destination') {
+        destinationItem = [...citiesListComplete.filter((x) => x[0].toLowerCase().includes(entry[1].toLowerCase()))]
+      } else {
+        list.push(...citiesListComplete.filter((x) => x[0].toLowerCase().includes(entry[1].toLowerCase())))
+      }
     }
-    getDistances(list)
+    getDistances([...originItem, ...list, ...destinationItem])
     .then((res) => {
       setListState(res.cityList)
       setTravelData(prevState => ({...prevState, completeDistance: res.completeDistance}))
