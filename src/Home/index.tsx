@@ -201,7 +201,7 @@ function App() {
                           disabled={paramsState.origin.name === ''}
                           onClick={() => setNewInput(prevState => ({ ...prevState, show: true }))}
                         >
-                        +  Add intermediate
+                        +  Add intermediate city
                         </button>
                   </div>
               }
