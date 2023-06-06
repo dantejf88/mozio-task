@@ -65,7 +65,7 @@ function SearchResult() {
                         padding="0"
                         fontWeight="500"
                         color={colors.black}
-                        textAlign='left'
+                        textAlign='center'
                         width='100%'
                       >
                         No results found

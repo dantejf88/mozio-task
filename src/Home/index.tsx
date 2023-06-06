@@ -18,10 +18,9 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [dateState, setDateState] = useState<{value: Date | undefined, error: boolean}>({value: undefined, error: false});
   const [passengersState, setPassengersState] = useState({value: 0, error: false});
-  const [paramsState, setParamsState] = useState<{origin: CityParamState, intermediate: CityParamState[], destination: CityParamState, totalParams: number, totalCities: CityName[]}>({
+  const [paramsState, setParamsState] = useState<{origin: CityParamState, intermediate: CityParamState[], destination: CityParamState, totalCities: CityName[]}>({
     origin: {name: '', errorMsg: '', error: false},
     intermediate: [],
-    totalParams: 0,
     totalCities: [],
     destination: {name: '', errorMsg: '', error: false}
   })
@@ -88,7 +87,6 @@ function App() {
     }
     setParamsState(prevState => ({
       ...prevState,
-      totalParams: intermediateList.length,
       totalCities: listCities,
       intermediate: intermediateList.filter((x) => x.name !== '')
     }))
@@ -148,7 +146,6 @@ function App() {
     setParamsState({
       origin: {name: '', errorMsg: '', error: false},
       intermediate: [],
-      totalParams: 0,
       totalCities: [],
       destination: {name: '', errorMsg: '', error: false}
     })
