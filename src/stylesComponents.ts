@@ -23,3 +23,26 @@ export const Text = styled.p<PropsText>`
     line-height: ${(props) => props.lineHeight || 'unset'};
     width: ${(props) => props.width || 'unset'};
 `
+
+export const Button = styled.button`
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 4px;
+  width: fit-content;
+  height: 38px;
+  background: ${props => props.theme.colors.black};
+  border: 1px solid ${props => props.theme.colors.grey};
+  color: ${props => props.theme.colors.white};
+  border-radius: 4px;
+  cursor: pointer;
+  &:disabled {
+    background: ${props => props.theme.colors.grey};
+  }
+  @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
+    width: 100%;
+  }
+`

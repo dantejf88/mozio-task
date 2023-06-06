@@ -10,6 +10,7 @@ declare module "styled-components" {
         black: string;
         grey: string;
         }
+    mediaQueryMobile: string    
   }
 }
 
@@ -25,4 +26,5 @@ export const colors = {
 
 export const theme: DefaultTheme = {
     colors: colors,
+    mediaQueryMobile: '600px',
 };

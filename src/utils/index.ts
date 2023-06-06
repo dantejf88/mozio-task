@@ -1,4 +1,4 @@
-import { CollectionCities, City, CollectionCitiesWithDistance, CollectionCitiesName, CityName, ItemsComparitionType, CityParamState } from '../types'
+import { CollectionCities, City, DateHandlerType, CollectionCitiesWithDistance, CollectionCitiesName, CityName, ItemsComparitionType, CityParamState } from '../types'
 
 export const setValue = (query: CityName) => {
     if (!query) {
@@ -40,10 +40,18 @@ export const distanceMaker = (list: City[]) => {
 
 export const itemsComparition = (a: CityName, b: CityName) => a.name === b.name;
 
+
 export const arrayFiltered = (a: CityName[], b: CityName[], compareFunction: ItemsComparitionType) => 
-  a.filter(aValue =>
+a.filter(aValue =>
     !b.some(bValue => 
-      compareFunction(aValue, bValue)));
+        compareFunction(aValue, bValue)));
+        
+export const dateHandler: DateHandlerType = (date) => {
+    if(date !== undefined) {
+        return (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear()
+    }
+    return ''
+};
 
 export const citiesListComplete: CollectionCities = [
     ['Paris', 48.856614, 2.352222],
@@ -112,3 +120,5 @@ export const citiesNames: CollectionCitiesName = [
     {name: 'Nîmes'},
     {name: 'Aix-en-Provence'},
 ]
+
+export const months: string[] = ['Jan', 'Febr', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Octr', 'Nov', 'Dec'];

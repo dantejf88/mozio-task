@@ -1,21 +1,35 @@
 import styled from 'styled-components'
 
 export const Container = styled.div`
-    padding: 200px 20px 20px 20px;
+    padding: 100px 20px 20px 20px;
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-direction: column;
-    width: 400px;
-    height: 100%;
-    overflow-y: scroll;
+    justify-content: center;
+    align-items: flex-start;
+    /* overflow-y: scroll; */
+    @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
+      flex-direction: column;
+      padding: 80px 20px 20px 20px;
+    }
 `
 
-export const DestinationInputContaier = styled.div`
+export const InputsContaier = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+    width: 450px;
+    @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
+      width: 100%;
+    }
+`
+
+export const DataContaier = styled.div`
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
+    height: 100%;
     flex-direction: column;
-    width: 100%;
-    height: 100px;
+    padding: 0 0 0 80px;
+    @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
+    }
 `

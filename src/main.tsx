@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <main style={{ width: '100vw', height:'100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <main style={{ width: '100%', height:'100%', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
         <RouterProvider router={router} />
       </main>
     </ThemeProvider>

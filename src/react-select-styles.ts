@@ -3,7 +3,6 @@ import { colors } from './theme'
 
 export const responsiveFontSizeStyle = () => ({
     color: `${colors.purpleLight}`,
-    // XXX: How to "${(props) => props.theme.mediaQueryBreak}" when using emotion?
     ['@media (max-width: 1000px)']: {
         fontSize: '14px',
     },

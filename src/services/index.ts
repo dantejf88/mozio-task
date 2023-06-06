@@ -19,7 +19,7 @@ export const getDistances = function (cities: City[]) {
         setTimeout(() => {
             const validation = cities.filter((x) => x[0] === 'Dijon')
             if (validation.length === 0) resolve(distanceMaker(cities));
-            return reject(Error("It broke"));
+            return reject({status: 500, errorMsg: 'Oops! Something went wrong!'});
         }, 1000)
     });
 };

@@ -31,3 +31,5 @@ export type CityWithDistance = {
 export type CollectionCitiesWithDistance = Array<CityWithDistance>
 
 export type ItemsComparitionType = (a: CityName, b: CityName) => boolean
+
+export type DateHandlerType = (date: Date | undefined) => string
