@@ -14,7 +14,6 @@ function RoadIcons(props) {
   useEffect(() => console.log(intermediateCities), [intermediateCities])
 
   return (
-      <>
         <Ul>
           <Li urlImg= '/circle.svg'/>  
           {
@@ -25,7 +24,6 @@ function RoadIcons(props) {
           }           
           <Li urlImg= '/marker.svg' final newInput={newInput}/>                       
         </Ul>
-      </>
   )
 }
 

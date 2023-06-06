@@ -5,6 +5,9 @@ export const InputsContaier = styled.div`
     justify-content: flex-start;
     align-items: center;
     flex-direction: column;
-    width: 100%;
+    /* width: 100%; */
     height: 100px;
+    @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
+        /* max-width: 175px; */
+    }
 `

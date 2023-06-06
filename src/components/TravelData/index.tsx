@@ -30,7 +30,7 @@ function TravelData(props) {
           </Text>
           <div style={{ 
                 border: '1px solid #E5E7EB',
-                width: '100px',
+                width: '110px',
                 minHeight: '38px',
                 borderRadius: '6px',
                 display: 'flex',

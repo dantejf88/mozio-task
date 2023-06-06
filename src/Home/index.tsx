@@ -1,9 +1,9 @@
 'use strict'
 import { useState, useEffect, Fragment } from 'react'
-import { Container, InputsContaier, DataContaier} from './homeStyles'
+import { Container, InputsContaier, DataContaier, DynamicContainer } from './homeStyles'
 import { dateHandler } from '../utils'
-import { Button, Text } from '../stylesComponents'
-import { useNavigate, useSearchParams, useParams } from 'react-router-dom'
+import { Button } from '../stylesComponents'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CityName, CityParamState } from '../types'
 import RoadIcons from '../components/RoadIcons'
 import TravelData from '../components/TravelData'
@@ -99,7 +99,6 @@ function App() {
   }, [searchParams])
 
   const handleChange = (e: CityName, name: string) => {
-    console.log(e, name)
     const paramValue = !e ? '' : e.name
     searchParams.set(name, paramValue);
     setSearchParams(searchParams)
@@ -122,7 +121,7 @@ function App() {
       setParamsState(prevState => ({
         ...prevState,
         [element.key]: {
-          name: '',
+          name: element.name,
           errorMsg: err.errorMsg,
           error: err.status === 500
         },
@@ -138,7 +137,6 @@ function App() {
         return query += `&${element.key}=${element.name}`
       })
     }
-    console.log(query)  
     return navigate(`/result?${query}`)
   }
 
@@ -154,70 +152,68 @@ function App() {
   // }
 
   return (
-    <section>
-    <Container>
+    <section style={{ width: '100%', padding: '0 20px' }}>
+      <Container>
         <InputsContaier>
-          <div style={{ display: 'flex', flexDirection: 'column', padding: '0 40px 0 0', width: '20%' }}>
+          <DynamicContainer widthDesktop='20%' widthMobile='10%'>
             <RoadIcons intermediateCities={paramsState.intermediate} newInput={newInput.show}/>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', width: '80%'  }}>
-            <OriginInput
-              paramsState={paramsState} 
-              handleChange={handleChange}
-              setError={setError}
-            />
-            {
-              paramsState.intermediate.map((x, i) => {
-                  return (
-                    <Fragment key={i}>
-                      <IntermediateInput
-                        paramsState={paramsState} 
-                        handleChange={handleChange}
-                        setError={setError}
-                        element={x}
-                        index={i}
-                      />
-                    </Fragment>
-                  )
-              })
-            }
-            {
-              newInput.show ? (
-                <NewInput
-                  paramsState={paramsState} 
-                  handleChange={handleChange}
-                  setNewInput={setNewInput}
-                  newInput={newInput}
-                />
-              ) : 
-                <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%', margin: '0 0 20px 0' }}>
-                  {
-                    paramsState.origin.name !== '' && 
-                      <button 
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          outline: 'none',
-                          color: `${colors.purpleDark}`,
-                          cursor: 'pointer',
-                          padding: '0',
-                        }}
-                        onClick={() => setNewInput(prevState => ({ ...prevState, show: true }))}
-                      >
-                        Add intermediate
-                      </button>
-                  }
-                </div>
-            }
-            <DestinationInput
-              paramsState={paramsState} 
-              handleChange={handleChange}
-              setError={setError}
-            />
-            {/* <div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '20px 0' }}>
-              <button onClick={clearForm} disabled={!paramsState.totalCities.length} >Clear form</button>     
-            </div> */}
-          </div>
+          </DynamicContainer>
+          <DynamicContainer widthDesktop='80%' widthMobile='90%'>
+              <OriginInput
+                paramsState={paramsState} 
+                handleChange={handleChange}
+                setError={setError}
+              />
+              {
+                paramsState.intermediate.map((x, i) => {
+                    return (
+                      <Fragment key={i}>
+                        <IntermediateInput
+                          paramsState={paramsState} 
+                          handleChange={handleChange}
+                          setError={setError}
+                          element={x}
+                          index={i}
+                        />
+                      </Fragment>
+                    )
+                })
+              }
+              {
+                newInput.show ? (
+                  <NewInput
+                    paramsState={paramsState} 
+                    handleChange={handleChange}
+                    setNewInput={setNewInput}
+                    newInput={newInput}
+                  />
+                ) : 
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%', margin: '0 0 20px 0' }}>
+                        <button 
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            outline: 'none',
+                            color: `${paramsState.origin.name === '' ? colors.purpleLight : colors.purpleDark}`,
+                            cursor: 'pointer',
+                            padding: '0',
+                          }}
+                          disabled={paramsState.origin.name === ''}
+                          onClick={() => setNewInput(prevState => ({ ...prevState, show: true }))}
+                        >
+                        +  Add intermediate
+                        </button>
+                  </div>
+              }
+              <DestinationInput
+                paramsState={paramsState} 
+                handleChange={handleChange}
+                setError={setError}
+              />
+              {/* <div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '20px 0' }}>
+                <button onClick={clearForm} disabled={!paramsState.totalCities.length} >Clear form</button>     
+              </div> */}
+          </DynamicContainer>
         </InputsContaier>
         <DataContaier>
           <TravelData
