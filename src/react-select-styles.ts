@@ -1,11 +1,8 @@
-import { ClearIndicatorProps, StylesConfig, OptionProps, components } from 'react-select'
+import { StylesConfig } from 'react-select'
 import { colors } from './theme'
 
 export const responsiveFontSizeStyle = () => ({
     color: `${colors.purpleLight}`,
-    ['@media (max-width: 1000px)']: {
-        fontSize: '14px',
-    },
 })
 
 export const createRecordsStyles: StylesConfig = {

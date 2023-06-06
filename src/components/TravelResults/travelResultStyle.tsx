@@ -11,6 +11,7 @@ export const Container = styled.section`
 export const Ul = styled.ul`
     display: flex;
     flex-direction: column;
+
     @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
     }
 `
@@ -21,12 +22,18 @@ interface LiProp {
 
 export const Li = styled.li<LiProp>`
     /* display: flex; */
-    height: 44px;
+    position: relative;
+    height: 70px;
+    width: 140px;
     list-style-image: ${props => `url(${props.urlImg})`};
     &::marker {
-        color: ${props => props.theme.colors.purpleDark};
+      color: ${props => props.theme.colors.purpleDark};
+    }
+    > p {
+        top: 0;
+        position: absolute;
     }
     @media (max-width: ${(props) => props.theme.mediaQueryMobile}) {
-      flex-direction: column;
+      
     }
 `

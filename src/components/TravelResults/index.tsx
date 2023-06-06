@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { Text, Button } from '../../stylesComponents'
 import { Ul, Li, Container } from './travelResultStyle'
+import { TravelDataType } from '../../types'
 import { colors } from '../../theme'
 
-function TravelResult(props) {
+function TravelResult(props: { listState: any, travelData: TravelDataType }) {
   const { listState, travelData } = props
   const navigate = useNavigate();
 
@@ -15,32 +16,34 @@ function TravelResult(props) {
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '30px' }} >
                 {
                   listState.map((x: any, i: number) => (
-                    <div key={i} style={{ border: `1px solid ${colors.purpleDark}`, padding: '5px', borderRadius: '6px', margin: '10px 0' }}>
-                      <Text
-                        fontSize="14px"
-                        lineHeight="12px"
-                        letterSpacing="0px"
-                        padding="0"
-                        fontWeight="500"
-                        color={colors.purpleDark}
-                        textAlign='left'
-                        width='100%'
-                      >
-                          {x.distance}km
-                      </Text>
-                    </div>
+                    <div key={i} style={{ height: '70px' }}>
+                      <div  style={{ border: `1px solid ${colors.purpleDark}`, padding: '5px', borderRadius: '6px', margin: '10px 0' }}>
+                        <Text
+                          fontSize="14px"
+                          lineHeight="12px"
+                          letterSpacing="0px"
+                          padding="0"
+                          fontWeight="500"
+                          color={colors.purpleDark}
+                          textAlign='left'
+                          width='100%'
+                        >
+                            {x.distance}km
+                        </Text>
+                      </div>
+                    </div>  
                   ))
                 }
             </div>
             <Ul style={{ display: 'flex', flexDirection: 'column' }} >
                 {
                   listState.map((x: any, i: number) => (
-                      <Li key={i} style={{ height: '44px' }} urlImg= '/circle.svg' >
+                      <Li key={i} urlImg= '/bullets.svg' >
                         <Text                   
                           fontSize="16px"
                           lineHeight="16px"
                           letterSpacing="0px"
-                          padding="10px 0 5px 5px"
+                          padding="0 5px"
                           fontWeight="440"
                           color={colors.black}
                           textAlign='left'
@@ -56,7 +59,7 @@ function TravelResult(props) {
                         fontSize="16px"
                         lineHeight="16px"
                         letterSpacing="0px"
-                        padding="10px 0 5px 5px"
+                        padding="0 5px"
                         fontWeight="500"
                         color={colors.black}
                         textAlign='left'
@@ -92,9 +95,10 @@ function TravelResult(props) {
               textAlign='center'
               width='100%'
             >
-                <span
-                  style={{ color: `${colors.purpleDark}`, fontWeight: '700' }}
-                >{travelData.passengers}</span> passengers
+                <span style={{ color: `${colors.purpleDark}`, fontWeight: '700' }}>
+                  {travelData.passengers}
+                </span> 
+               {' '} passengers
             </Text>
             <Text
               fontSize="16px"
@@ -109,10 +113,7 @@ function TravelResult(props) {
                 {travelData.date}
             </Text>
           </div>
-          <Button
-            onClick={handleBack} 
-            // disabled={disabledSubmit} 
-          >
+          <Button onClick={handleBack} >
             Back
           </Button>  
         </Container>

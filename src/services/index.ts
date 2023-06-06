@@ -14,7 +14,7 @@ export const getCities = function (value: string, citiesList: CityName[] | []): 
     });
 };
 
-export const getDistances = function (cities: City[]) {
+export const getDistances = function (cities: City[]): Promise<any> {
     return new Promise(function (resolve, reject) {
         setTimeout(() => {
             const validation = cities.filter((x) => x[0] === 'Dijon')

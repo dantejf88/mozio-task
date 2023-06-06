@@ -76,10 +76,7 @@ function App() {
               setDateState({ value: new Date(entry[1]), error: false })
             }
         } else if(
-            entry[0] !== 'origin' && 
-            entry[0] !== 'destination' &&
-            entry[0] !== 'passengers' && 
-            entry[0] !== 'date'      
+            entry[0].includes('intermediate')     
           ) {
         intermediateList.push({ 
           key: entry[0], 
@@ -98,10 +95,14 @@ function App() {
     setNewInput(prevState => ({ ...prevState, show: false }))
   }, [searchParams])
 
-  const handleChange = (e: CityName, name: string) => {
-    const paramValue = !e ? '' : e.name
-    searchParams.set(name, paramValue);
-    setSearchParams(searchParams)
+  const handleChange = (e: CityName, name: string): void => {
+    if(e===null && name !== 'origin' && name !== 'destination') {
+      searchParams.delete(name)
+    } else {
+      const paramValue = !e ? '' : e.name
+      searchParams.set(name, paramValue)
+    }
+    return setSearchParams(searchParams)
   }
 
   const setError = (element: any, index: number | undefined, err: any) => {
@@ -140,16 +141,18 @@ function App() {
     return navigate(`/result?${query}`)
   }
 
-  // const clearForm = () => {
-  //   setSearchParams('')
-  //   setParamsState({
-  //     origin: {name: '', errorMsg: '', error: false},
-  //     intermediate: [],
-  //     totalParams: 0,
-  //     totalCities: [],
-  //     destination: {name: '', errorMsg: '', error: false}
-  //   })
-  // }
+  const onClear = () => {
+    setSearchParams('?origin=&destination=')
+    setDateState({ value: undefined, error: true })
+    setPassengersState({ value: 0, error: true })
+    setParamsState({
+      origin: {name: '', errorMsg: '', error: false},
+      intermediate: [],
+      totalParams: 0,
+      totalCities: [],
+      destination: {name: '', errorMsg: '', error: false}
+    })
+  }
 
   return (
     <section style={{ width: '100%', padding: '0 20px' }}>
@@ -210,27 +213,35 @@ function App() {
                 handleChange={handleChange}
                 setError={setError}
               />
-              {/* <div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '20px 0' }}>
-                <button onClick={clearForm} disabled={!paramsState.totalCities.length} >Clear form</button>     
-              </div> */}
           </DynamicContainer>
         </InputsContaier>
         <DataContaier>
           <TravelData
-            setDate={setDateState}
             date={dateState}
             passengers={passengersState}
-            setPassengers={setPassengersState}
             handleChange={handleChange}
           />
         </DataContaier>
       </Container>
-      <div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '20px 0' }}>
+      <div style={{ 
+        display: 'flex',
+        justifyContent: 'space-between',
+        height: '120px',
+        width: '100%',
+        margin: '0 0 20px 0',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}>
         <Button
           onClick={onSubmit} 
           disabled={disabledSubmit} 
         >
           Submit
+        </Button>     
+        <Button
+          onClick={onClear} 
+        >
+          Clear form
         </Button>     
       </div>
     </section>

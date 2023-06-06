@@ -2,7 +2,7 @@
 import { InputsContaier } from './InputsStyles'
 import { Text } from '../../stylesComponents'
 import { getCities } from '../../services'
-import { setValue } from '../../utils'
+// import { setValue } from '../../utils'
 import { CityName } from '../../types'
 import AsyncSelect from 'react-select/async'
 import { createRecordsStyles } from '../../react-select-styles'
@@ -27,7 +27,7 @@ function OriginInput(props: any) {
         </Text>
           <AsyncSelect
             id='origin'
-            value={paramsState.origin.name ? setValue(paramsState.origin) : undefined}
+            value={paramsState.origin.name ? paramsState.origin : null}
             backspaceRemovesValue={false}
             loadOptions={(e) => 
               getCities(e, paramsState.totalCities)
@@ -49,8 +49,7 @@ function OriginInput(props: any) {
             placeholder='City name'
             isClearable
             required
-            label='City of origin'
-            styles={createRecordsStyles}
+            styles={createRecordsStyles as any}
           />
           {
             paramsState.origin.error &&

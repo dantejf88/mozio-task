@@ -5,12 +5,13 @@ import { Container } from './resultStyle'
 import TravelResult from '../components/TravelResults'
 import { colors } from '../theme'
 import { citiesListComplete, months } from '../utils'
+import { TravelDataType } from '../types'
 import { getDistances } from '../services'
 
 function SearchResult() {
   const [listState, setListState] = useState<any>()
-  const [travelData, setTravelData] = useState<any>({ completeDistance: 0, passengers: 0, date: '' })
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [travelData, setTravelData] = useState<TravelDataType>({ completeDistance: 0, passengers: 0, date: '' })
+  const [searchParams] = useSearchParams()
   const [errorRequest, setErrorRequest] = useState({show: false, errorMsg: ''})
   const navigate = useNavigate();
 
@@ -18,7 +19,7 @@ function SearchResult() {
     const list = []
     for (const entry of searchParams.entries()) {
       if(entry[0] === 'passengers') {
-        setTravelData(prevState => ({...prevState, passengers: entry[1]}))
+        setTravelData((prevState: TravelDataType) => ({...prevState, passengers: entry[1]}))
       } else if(entry[0] === 'date' && entry[1] !== '') {
         const date = new Date(entry[1])
         setTravelData(prevState => ({...prevState, date: `${months[date.getMonth()]} ${String(date.getDate())}, ${date.getFullYear()}`}))
@@ -27,7 +28,6 @@ function SearchResult() {
     }
     getDistances(list)
     .then((res) => {
-      console.log(res)
       setListState(res.cityList)
       setTravelData(prevState => ({...prevState, completeDistance: res.completeDistance}))
     })
@@ -84,7 +84,7 @@ function SearchResult() {
                   color={colors.purpleDark}
                   textAlign='center'
                 >
-                  LOADING
+                  LOADING...
                 </Text>
               }
             </div>

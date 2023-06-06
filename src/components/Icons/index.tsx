@@ -1,7 +1,7 @@
 import { Marker } from "./marker"
 import { Circle } from "./circle"
 
-const select = (name: string, width: string, height: string, color: string) => {
+const select = (name: string) => {
   switch (name) {
     case "marker":
       return <Marker />
@@ -13,7 +13,7 @@ const select = (name: string, width: string, height: string, color: string) => {
 }
 
 const Icon = (props: any) => {
-  return <div style={{ width: 'fit-content', height: 'fit-content' }} >{select(props.name, props.width, props.height, props.color)}</div>
+  return <div style={{ width: 'fit-content', height: 'fit-content' }} >{select(props.name)}</div>
 }
 
 export default Icon

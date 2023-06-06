@@ -1,3 +1,4 @@
+
 export interface OptionRecords {
     value: string
     label: string
@@ -33,3 +34,5 @@ export type CollectionCitiesWithDistance = Array<CityWithDistance>
 export type ItemsComparitionType = (a: CityName, b: CityName) => boolean
 
 export type DateHandlerType = (date: Date | undefined) => string
+
+export type TravelDataType = { completeDistance: number, passengers: number | string, date: string }

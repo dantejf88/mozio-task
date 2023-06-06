@@ -2,7 +2,7 @@
 import { InputsContaier } from './InputsStyles'
 import { Text } from '../../stylesComponents'
 import { getCities } from '../../services'
-import { setValue } from '../../utils'
+// import { setValue } from '../../utils'
 import { CityName } from '../../types'
 import AsyncSelect from 'react-select/async'
 import { createRecordsStyles } from '../../react-select-styles'
@@ -27,7 +27,7 @@ function DestinationInput(props: any) {
           </Text>
         <AsyncSelect
           id='destination'
-          value={paramsState.destination.name ? setValue(paramsState.destination) : undefined}
+          value={paramsState.destination.name ? paramsState.destination : null}
           backspaceRemovesValue={false}
           loadOptions={(e) => 
             getCities(e, paramsState.totalCities)
@@ -48,7 +48,7 @@ function DestinationInput(props: any) {
           isClearable
           isDisabled={paramsState.origin.name === ''}
           required
-          styles={createRecordsStyles}
+          styles={createRecordsStyles as any}
         />
         {
           paramsState.destination.error &&

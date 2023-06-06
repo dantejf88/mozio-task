@@ -2,7 +2,7 @@
 import { InputsContaier } from './InputsStyles'
 import { Text } from '../../stylesComponents'
 import { getCities } from '../../services'
-import { setValue } from '../../utils'
+// import { setValue } from '../../utils'
 import { CityName } from '../../types'
 import AsyncSelect from 'react-select/async'
 import { createRecordsStyles } from '../../react-select-styles'
@@ -27,7 +27,7 @@ function IntermediateInput(props: any) {
         </Text>
         <AsyncSelect
         id={`${element.name}`} 
-        value={paramsState.intermediate[index]?.name ? setValue(paramsState.intermediate[index]) : undefined}
+        value={paramsState.intermediate[index]?.name ? paramsState.intermediate[index] : undefined}
         backspaceRemovesValue={false}
         loadOptions={(e) => 
             getCities(e, paramsState.totalCities)
@@ -49,7 +49,7 @@ function IntermediateInput(props: any) {
         placeholder='City name'
         isClearable
         isDisabled={paramsState.origin.name === ''}
-        styles={createRecordsStyles}
+        styles={createRecordsStyles as any}
         />
         {
         element.error &&

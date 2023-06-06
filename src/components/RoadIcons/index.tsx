@@ -1,26 +1,18 @@
 'use strict'
 import { Ul, Li } from './RoadIconsStyles'
-import { Text } from '../../stylesComponents'
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Icon from '../Icons';
-import { dateHandler } from '../../utils';
-import { colors } from '../../theme'
-import { useEffect } from 'react';
 
-function RoadIcons(props) {
+function RoadIcons(props: any) {
   const { intermediateCities, newInput } = props
-
-  useEffect(() => console.log(intermediateCities), [intermediateCities])
 
   return (
         <Ul>
-          <Li urlImg= '/circle.svg'/>  
+          <Li urlImg= '/bullets.svg'/>  
           {
-            intermediateCities.map((element, index) => <Li urlImg= '/circle.svg' key={index}/>  )
+            intermediateCities.map((element: any, index: number) => <Li urlImg= '/bullets.svg' key={`${index}${element.toString()}`}/>  )
           }          
           {
-            newInput && <Li urlImg= '/circle.svg' />
+            newInput && <Li urlImg= '/circle.svg' newInput={newInput} />
           }           
           <Li urlImg= '/marker.svg' final newInput={newInput}/>                       
         </Ul>

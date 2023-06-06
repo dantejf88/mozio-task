@@ -10,6 +10,11 @@ import { colors } from '../../theme'
 function NewInput(props: any) {
   const { paramsState, handleChange, setNewInput, newInput } = props
 
+    const queryNameMaker = () => {
+        const number = paramsState.intermediate[paramsState.intermediate.length - 1]?.key?.slice(-1) || 0
+        return parseInt(number) 
+    }
+
   return (
         <InputsContaier>
             <Text
@@ -36,7 +41,7 @@ function NewInput(props: any) {
                 }
                 getOptionLabel={(xs: CityName) => xs.name}
                 getOptionValue={(xs: CityName) => xs.name}
-                onChange={(xs) => handleChange(xs, `intermediate${paramsState.totalParams + 1}`)}
+                onChange={(xs) => handleChange(xs, `intermediate${queryNameMaker() + 1}`)}
                 noOptionsMessage={(e) => 
                     e.inputValue.toLowerCase().includes('fail') ? null 
                     : e.inputValue.length > 0 ? 'No match found (cannot repeat cities)' 
@@ -47,7 +52,7 @@ function NewInput(props: any) {
                 placeholder='City name'
                 isClearable
                 isDisabled={paramsState.origin.name === ''}
-                styles={createRecordsStyles}
+                styles={createRecordsStyles as any}
             />
             {
             newInput.error &&

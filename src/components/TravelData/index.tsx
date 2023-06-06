@@ -3,15 +3,11 @@ import { HandleContainer } from './TravelDataStyles'
 import { Text } from '../../stylesComponents'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Icon from '../Icons';
 import { dateHandler } from '../../utils';
 import { colors } from '../../theme'
-import { useEffect } from 'react';
 
-function TravelData(props) {
-  const { handleChange, setDate, date, passengers, setPassengers } = props
-
-  useEffect(() => console.log(passengers), [passengers])
+function TravelData(props: any) {
+  const { handleChange, date, passengers } = props
 
   return (
       <>
