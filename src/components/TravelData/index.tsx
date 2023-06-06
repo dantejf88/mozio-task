@@ -84,6 +84,7 @@ function TravelData(props: any) {
           <DatePicker
             minDate={new Date()}
             selected={date.value}
+            onKeyDown={e => e.preventDefault()}
             onChange={(e: Date) => handleChange({name: dateHandler(e)}, 'date' )}
             className="react-datepicker__current-month react-datepicker-time__header react-datepicker-year-header react-datepicker__day--selected react-datepicker-styles react-datepicker__input-container react-datepicker__month-container react-datepicker__header react-datepicker"
           />
