@@ -2,7 +2,6 @@
 import { InputsContaier } from './InputsStyles'
 import { Text } from '../../stylesComponents'
 import { getCities } from '../../services'
-// import { setValue } from '../../utils'
 import { CityName } from '../../types'
 import AsyncSelect from 'react-select/async'
 import { createRecordsStyles } from '../../react-select-styles'
